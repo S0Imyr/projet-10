@@ -1,11 +1,13 @@
 from django.shortcuts import render
-from django.http import JsonResponse
+from django.http import JsonResponse, Http404
 
 from rest_framework.decorators import api_view
+from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework import status
 
 from.serializers import ProjectSerializer
-from .models import Project
+from .models import Project, Issue, Comment, Contributor
 
 
 @api_view(['GET'])
@@ -32,98 +34,48 @@ def apiOverview(request):
     return Response(api_urls)
 
 
-@api_view(['GET'])
-def get_projects_list(request):
-    projects = Project.objects.all()
-    serializer = ProjectSerializer(projects, many=True)
-    return Response(serializer.data)
+class ProjectList(APIView):
+    """
+    List all projects, or create a new project
+    """
+    def get(self, request, format=None):
+        projects = Project.objects.all()
+        serializer = ProjectSerializer(projects, many=True)
+        return Response(serializer.data)
+
+    def post(self, request, format=None):
+        serializer = ProjectSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-@api_view(['POST'])
-def create_project(request):
-    pass
 
+class ProjectDetail(APIView):
+    """
+    Retrieve, update or delete a project instance
+    """
+    def get_object(self, pk):
+        try:
+            return Project.objects.get(pk=pk)
+        except Project.DoesNotExist:
+            raise Http404
 
-@api_view(['GET'])
-def get_project_details(request):
-    pass
+    def get(self, request, pk, format=None):
+        project = self.get_object(pk)
+        serializer = ProjectSerializer(project)
+        return Response(serializer.data)
+    
+    def put(self, request, pk, format=None):
+        project = self.get_object(pk)
+        serializer = ProjectSerializer(project, data=request)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-
-@api_view(['PUT'])
-def update_project(request):
-    pass
-
-
-@api_view(['DELETE'])
-def delete_project(request):
-    pass
-
-
-@api_view(['POST'])
-def add_user_to_project(request):
-    pass
-
-
-@api_view(['GET'])
-def get_users_list_on_project(request):
-    pass
-
-
-@api_view(['POST'])
-def create_project(request):
-    pass
-
-
-@api_view(['DELETE'])
-def delete_user_from_project(request):
-    pass
-
-
-@api_view(['GET'])
-def get_issues_list_for_project(request):
-    pass
-
-
-@api_view(['POST'])
-def create_issue_for_project(request):
-    pass
-
-
-@api_view(['PUT'])
-def update_issue_project(request):
-    pass
-
-
-@api_view(['DELETE'])
-def delete_issue_project(request):
-    pass
-
-
-@api_view(['POST'])
-def create_comment_for_issue(request):
-    pass
-
-
-@api_view(['GET'])
-def get_comments_list_for_issue(request):
-    pass
-
-
-@api_view(['POST'])
-def create_issue_for_project(request):
-    pass
-
-
-@api_view(['PUT'])
-def update_comment(request):
-    pass
-
-
-@api_view(['DELETE'])
-def delete_comment(request):
-    pass
-
-
-@api_view(['GET'])
-def get_comment_by_id(request):
-    pass
+    def delete(self, request, pk, format=None):
+        project = self.get_object(pk)
+        project.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
