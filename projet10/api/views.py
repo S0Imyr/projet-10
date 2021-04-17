@@ -13,28 +13,30 @@ from .models import Project, Issue, Comment, Contributor
 @api_view(['GET'])
 def apiOverview(request):
     api_urls = {
-        'Projects list (GET)': '/projects/',
-        'Create project (POST)': '/projects/',
-        'Get project details  (GET)': '/projects/<str:pk>',
-        'Update a project (PUT)': '/projects/<str:pk>',
-        'Delete a project (DELETE)': '/projects/<str:pk>',
-        'Add a user to a project (POST)': '/projects/<str:pk>/users/',
-        'Get the list of users of a project(GET)': '/projects/<str:pk>/users/',
+        'Projects list (GET) and Create project (POST)': '/projects/',
+        'Get project details  (GET), Update (PUT) and Delete (DELETE) a project': '/projects/<str:pk>',
+        'Users list (GET) and Add a user to a project (POST)': '/projects/<str:pk>/users/',
         'Delete a user from a project (DELETE)': '/projects/<str:pk>/users/<str:pk>',
-        'Get the list of issues for a project (GET)': '/projects/<str:pk>/issues/',
-        'Create an issue for a project (POST)': '/projects/<str:pk>/issues/',
-        'Update an issue for a project (PUT)': '/projects/<str:pk>/issues/<str:pk>',
-        'Delete an issue for a project (DELETE)': '/projects/<str:pk>/issues/<str:pk>',
-        'Create comment about an issue (POST)': '/projects/<str:pk>/issues/<str:pk>/comments/',
-        'Get the list of comments for an issue (GET)': '/projects/<str:pk>/issues/<str:pk>/comments/',
-        'Update a comments (PUT)': '/projects/<str:pk>/issues/<str:pk>/comments/<str:pk>',
-        'Delete a comments (DELETE)': '/projects/<str:pk>/issues/<str:pk>/comments/<str:pk>',
+        'Issues list for a project (GET) and Create an issue for a project (POST)': '/projects/<str:pk>/issues/',
+        'Update (PUT) and Delete (DELETE) an issue for a project (PUT)': '/projects/<str:pk>/issues/<str:pk>',
+        'Comments List for an issue (GET) and Create comment about an issue (POST)': '/projects/<str:pk>/issues/<str:pk>/comments/',
+        'Update (PUT) and Delete (DELETE) a comment ': '/projects/<str:pk>/issues/<str:pk>/comments/<str:pk>',
         'Get a comments with its id (GET)': '/projects/<str:pk>/issues/<str:pk>/comments/<str:pk>',
     }
     return Response(api_urls)
 
 
-class ProjectList(APIView):
+class Register(APIView):
+    def post(self, request, format=None):
+        pass
+
+
+class Login(APIView):
+    def post(self, request, format=None):
+        pass
+
+
+class ProjectsList(APIView):
     """
     List all projects, or create a new project
     """
@@ -79,3 +81,51 @@ class ProjectDetail(APIView):
         project = self.get_object(pk)
         project.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
+
+
+class ProjectUsersList(APIView):
+    def get(self, request, format=None):
+        pass
+
+    def post(self, request, format=None):
+        pass
+
+
+class ProjectUserDelete(APIView):
+    def delete(self, request, format=None):
+        pass
+
+
+class ProjectIssuesList(APIView):
+    def get(self, request, format=None):
+        pass
+
+    def post(self, request, format=None):
+        pass
+
+
+class ProjectIssueModify(APIView):
+    def put(self, request, format=None):
+        pass
+
+    def delete(self, request, format=None):
+        pass
+
+
+class IssueCommentsList(APIView):
+    def get(self, request, format=None):
+        pass
+
+    def post(self, request, format=None):
+        pass
+
+
+class IssueCommentDetail(APIView):
+    def get(self, request, format=None):
+        pass
+    
+    def put(self, request, format=None):
+        pass
+
+    def delete(self, request, format=None):
+        pass
