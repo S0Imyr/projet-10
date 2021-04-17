@@ -26,16 +26,6 @@ def apiOverview(request):
     return Response(api_urls)
 
 
-class Register(APIView):
-    def post(self, request, format=None):
-        pass
-
-
-class Login(APIView):
-    def post(self, request, format=None):
-        pass
-
-
 class ProjectsList(APIView):
     """
     List all projects, or create a new project
@@ -123,7 +113,7 @@ class IssueCommentsList(APIView):
 class IssueCommentDetail(APIView):
     def get(self, request, format=None):
         pass
-    
+
     def put(self, request, format=None):
         pass
 
