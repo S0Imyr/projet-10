@@ -1,7 +1,10 @@
 from django.shortcuts import render
 from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from .models import User
+from .serializers import UserSerializer
+
 
 class Register(APIView):
     def post(self, request, format=None):
@@ -15,3 +18,11 @@ class Register(APIView):
 class Login(APIView):
     def post(self, request, format=None):
         pass
+
+
+class UsersList(APIView):
+    def get(self, request, format=None):
+        users = User.objects.all()
+        serializer = UserSerializer(users, many=True)
+        return Response(serializer.data)
+
