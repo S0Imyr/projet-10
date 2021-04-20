@@ -43,7 +43,6 @@ class ProjectsList(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-
 class ProjectDetail(APIView):
     """
     Retrieve, update or delete a project instance
@@ -61,7 +60,7 @@ class ProjectDetail(APIView):
     
     def put(self, request, pk, format=None):
         project = self.get_object(pk)
-        serializer = ProjectSerializer(project, data=request)
+        serializer = ProjectSerializer(instance=project, data=request.data)
         if serializer.is_valid():
             serializer.save()
             return Response(serializer.data)
