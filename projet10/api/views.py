@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAdminUser, IsAuthenticated
 
 from.serializers import ProjectSerializer, IssueSerializer, CommentSerializer, ContributorSerializer
 from .models import Project, Issue, Comment, Contributor
+from authentication.models import User
 
 
 @api_view(['GET'])
@@ -42,7 +43,7 @@ class ProjectsList(APIView):
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
             project = serializer.save()
-            Contributor.objects.create(user_id=request.user, project_id=project)
+            Contributor.objects.create(user_id=request.user, project_id=project, permission='allowed', role='author')
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
@@ -102,13 +103,15 @@ class ProjectUserDelete(APIView):
     
     def get_object(self, pk1, pk2):
         try:
-            return Contributor.objects.get(user_id=pk1, project_id=pk2)
+            project = Project.objects.get(pk=pk1)
+            user = User.objects.get(pk=pk2)
+            return Contributor.objects.get(user_id=user, project_id=project)
         except Contributor.DoesNotExist:
             raise Http404
 
-    def delete(self, request, format=None):
-        project = self.get_object(pk1, pk2)
-        project.delete()
+    def delete(self, request, pk1, pk2, format=None):
+        contributor = self.get_object(pk1, pk2)
+        contributor.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
