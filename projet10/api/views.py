@@ -32,7 +32,7 @@ class ProjectsList(APIView):
     """
     List all projects, or create a new project
     """
-    
+
     def get(self, request, format=None):
         projects = Project.objects.all()
         serializer = ProjectSerializer(projects, many=True)
@@ -41,7 +41,8 @@ class ProjectsList(APIView):
     def post(self, request, format=None):
         serializer = ProjectSerializer(data=request.data)
         if serializer.is_valid():
-            serializer.save()
+            project = serializer.save()
+            Contributor.objects.create(user_id=request.user, project_id=project)
             return Response(serializer.data, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
