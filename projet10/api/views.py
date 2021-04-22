@@ -6,7 +6,9 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from.serializers import ProjectSerializer
+from rest_framework.permissions import IsAdminUser, IsAuthenticated
+
+from.serializers import ProjectSerializer, IssueSerializer, CommentSerializer, ContributorSerializer
 from .models import Project, Issue, Comment, Contributor
 
 
@@ -30,6 +32,7 @@ class ProjectsList(APIView):
     """
     List all projects, or create a new project
     """
+    permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         projects = Project.objects.all()
         serializer = ProjectSerializer(projects, many=True)
@@ -47,6 +50,7 @@ class ProjectDetail(APIView):
     """
     Retrieve, update or delete a project instance
     """
+    permission_classes = [IsAuthenticated]
     def get_object(self, pk):
         try:
             return Project.objects.get(pk=pk)
@@ -73,19 +77,31 @@ class ProjectDetail(APIView):
 
 
 class ProjectUsersList(APIView):
-    def get(self, request, format=None):
-        pass
+    """
+    List all users for a given project(pk), or create a new user for a given project(pk)
+    """
+    permission_classes = [IsAuthenticated]
+    def get(self, request, pk, format=None):
+        contributors = Contributor.objects.filter(project_id=pk)
+        serializer = ContributorSerializer(contributors, many=True)
+        return Response(serializer.data)
 
-    def post(self, request, format=None):
-        pass
+    def post(self, request, pk, format=None):
+        serializer = ContributorSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 class ProjectUserDelete(APIView):
+    permission_classes = [IsAuthenticated]
     def delete(self, request, format=None):
         pass
 
 
 class ProjectIssuesList(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         pass
 
@@ -94,6 +110,7 @@ class ProjectIssuesList(APIView):
 
 
 class ProjectIssueModify(APIView):
+    permission_classes = [IsAuthenticated]
     def put(self, request, format=None):
         pass
 
@@ -102,6 +119,7 @@ class ProjectIssueModify(APIView):
 
 
 class IssueCommentsList(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         pass
 
@@ -110,6 +128,7 @@ class IssueCommentsList(APIView):
 
 
 class IssueCommentDetail(APIView):
+    permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         pass
 

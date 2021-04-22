@@ -18,6 +18,7 @@ from django.urls import path, include
 from django.urls import include, path
 
 from rest_framework import routers
+from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView, TokenVerifyView
 
 from authentication import views
 
@@ -27,5 +28,10 @@ urlpatterns = [
     path('api/', include("api.urls")),
     path('api/signup/', views.Register.as_view(), name='register'),
     path('api/login/', views.Login.as_view(), name='login'),
-    path('api/users', views.UsersList.as_view(), name='users-list')
+    path('api/logout/', views.Logout.as_view(), name='logout'),
+    path('api/users', views.UsersList.as_view(), name='users-list'),
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/token/verify/', TokenVerifyView.as_view(), name='token_verify'),
 ]
+
