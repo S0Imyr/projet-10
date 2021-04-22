@@ -32,7 +32,7 @@ class ProjectsList(APIView):
     """
     List all projects, or create a new project
     """
-    permission_classes = [IsAuthenticated]
+    
     def get(self, request, format=None):
         projects = Project.objects.all()
         serializer = ProjectSerializer(projects, many=True)
@@ -51,6 +51,7 @@ class ProjectDetail(APIView):
     Retrieve, update or delete a project instance
     """
     permission_classes = [IsAuthenticated]
+
     def get_object(self, pk):
         try:
             return Project.objects.get(pk=pk)
@@ -81,6 +82,7 @@ class ProjectUsersList(APIView):
     List all users for a given project(pk), or create a new user for a given project(pk)
     """
     permission_classes = [IsAuthenticated]
+
     def get(self, request, pk, format=None):
         contributors = Contributor.objects.filter(project_id=pk)
         serializer = ContributorSerializer(contributors, many=True)
@@ -96,12 +98,20 @@ class ProjectUsersList(APIView):
 
 class ProjectUserDelete(APIView):
     permission_classes = [IsAuthenticated]
+    
+    def get_object(self, pk1, pk2):
+        try:
+            return Contributor.objects.get(user_id=pk1, project_id=pk2)
+        except Contributor.DoesNotExist:
+            raise Http404
+
     def delete(self, request, format=None):
-        pass
+        project = self.get_object(pk1, pk2)
+        project.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProjectIssuesList(APIView):
-    permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         pass
 
@@ -110,7 +120,6 @@ class ProjectIssuesList(APIView):
 
 
 class ProjectIssueModify(APIView):
-    permission_classes = [IsAuthenticated]
     def put(self, request, format=None):
         pass
 
@@ -119,7 +128,6 @@ class ProjectIssueModify(APIView):
 
 
 class IssueCommentsList(APIView):
-    permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         pass
 
@@ -128,7 +136,6 @@ class IssueCommentsList(APIView):
 
 
 class IssueCommentDetail(APIView):
-    permission_classes = [IsAuthenticated]
     def get(self, request, format=None):
         pass
 
