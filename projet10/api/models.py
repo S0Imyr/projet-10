@@ -23,6 +23,10 @@ class Contributor(models.Model):
     project_id = models.ForeignKey(to=Project, on_delete=models.CASCADE)
     permission = models.CharField(max_length=128, choices=CONTRIBUTOR_PERMISSION_CHOICES)
     role = models.CharField(max_length=128)
+
+    class Meta:
+        unique_together = ('user_id', 'project_id', )
+
     def __str__(self):
         return f"{self.user_id} work on {self.project_id}"
 
