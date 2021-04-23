@@ -6,7 +6,7 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
 
-from rest_framework.permissions import IsAdminUser, IsAuthenticated
+from rest_framework.permissions import BasePermission, IsAdminUser, IsAuthenticated
 
 from.serializers import ProjectSerializer, IssueSerializer, CommentSerializer, ContributorSerializer
 from .models import Project, Issue, Comment, Contributor
@@ -29,11 +29,19 @@ def apiOverview(request):
     return Response(api_urls)
 
 
+class IsContributor(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        contributors = []
+        contributions = Contributor.objects.filter(project_id=obj)
+        for contribution in contributions:
+            contributors.append(contribution.user_id)
+        return  request.user in contributors
+
+
 class ProjectsList(APIView):
     """
     List all projects, or create a new project
     """
-
     def get(self, request, format=None):
         projects = Project.objects.all()
         serializer = ProjectSerializer(projects, many=True)
@@ -48,11 +56,11 @@ class ProjectsList(APIView):
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
-class ProjectDetail(APIView):
+class ProjectDetail(APIView, IsContributor):
     """
     Retrieve, update or delete a project instance
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsContributor]
 
     def get_object(self, pk):
         try:
@@ -116,10 +124,10 @@ class ProjectUserDelete(APIView):
 
 
 class ProjectIssuesList(APIView):
-    def get(self, request, format=None):
+    def get(self, request, pk, format=None):
         pass
 
-    def post(self, request, format=None):
+    def post(self, request, pk, format=None):
         pass
 
 
