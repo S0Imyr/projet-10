@@ -1,4 +1,4 @@
-from django.shortcuts import render
+from django.shortcuts import render, get_object_or_404
 from django.http import JsonResponse, Http404
 
 from rest_framework.decorators import api_view
@@ -30,12 +30,27 @@ def apiOverview(request):
 
 
 class IsContributor(BasePermission):
-    def has_object_permission(self, request, view, obj):
+    message = 'Only contributors are allowed'
+
+    def has_permission(self, request, view):
         contributors = []
-        contributions = Contributor.objects.filter(project_id=obj)
+        if 'pk' in view.kwargs:
+            project = get_object_or_404(Project, pk=view.kwargs['pk'])
+        elif 'pk1' in view.kwargs:
+            project = get_object_or_404(Project, pk=view.kwargs['pk1'])
+        contributions = Contributor.objects.filter(project_id=project)
         for contribution in contributions:
             contributors.append(contribution.user_id)
         return  request.user in contributors
+        
+
+    def has_object_permission(self, request, view, obj):
+        pass
+
+
+class IsAuthor(BasePermission):
+    def has_object_permission(self, request, view, obj):
+        return request.user == obj.author_user_id
 
 
 class ProjectsList(APIView):
@@ -87,11 +102,11 @@ class ProjectDetail(APIView, IsContributor):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ProjectUsersList(APIView):
+class ProjectUsersList(APIView, IsContributor):
     """
     List all users for a given project(pk), or create a new user for a given project(pk)
     """
-    permission_classes = [IsAuthenticated]
+    permission_classes = [IsContributor]
 
     def get(self, request, pk, format=None):
         contributors = Contributor.objects.filter(project_id=pk)
@@ -99,20 +114,23 @@ class ProjectUsersList(APIView):
         return Response(serializer.data)
 
     def post(self, request, pk, format=None):
-        serializer = ContributorSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        if int(request.data['project_id']) != pk:
+            serializer = ContributorSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
-class ProjectUserDelete(APIView):
-    permission_classes = [IsAuthenticated]
+class ProjectUserDelete(APIView, IsContributor):
+    permission_classes = [IsContributor]
     
     def get_object(self, pk1, pk2):
         try:
-            project = Project.objects.get(pk=pk1)
-            user = User.objects.get(pk=pk2)
+            project = get_object_or_404(Project, pk=pk1)
+            user = get_object_or_404(User, pk=pk2)
             return Contributor.objects.get(user_id=user, project_id=project)
         except Contributor.DoesNotExist:
             raise Http404
