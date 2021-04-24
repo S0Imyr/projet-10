@@ -45,10 +45,21 @@ class IsContributor(BasePermission):
         
 
     def has_object_permission(self, request, view, obj):
-        pass
-
+        if isinstance(obj, Project):
+            contributors = []
+            contributions = Contributor.objects.filter(project_id=obj)
+            for contribution in contributions:
+                contributors.append(contribution.user_id)
+            return  request.user in contributors
+        else:
+            return False
 
 class IsAuthor(BasePermission):
+    message = 'Only the author is allowed'
+
+    def has_permission(self, request, view):
+        pass
+
     def has_object_permission(self, request, view, obj):
         return request.user == obj.author_user_id
 
@@ -114,7 +125,7 @@ class ProjectUsersList(APIView, IsContributor):
         return Response(serializer.data)
 
     def post(self, request, pk, format=None):
-        if int(request.data['project_id']) != pk:
+        if int(request.data['project_id']) == pk:
             serializer = ContributorSerializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
@@ -141,15 +152,27 @@ class ProjectUserDelete(APIView, IsContributor):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ProjectIssuesList(APIView):
+class ProjectIssuesList(APIView, IsContributor):
+    permission_classes = [IsContributor]
+
     def get(self, request, pk, format=None):
-        pass
+        issues = Issue.objects.filter(project_id=pk)
+        serializer = IssueSerializer(issues, many=True)
+        return Response(serializer.data)
 
     def post(self, request, pk, format=None):
-        pass
+        if int(request.data['project_id']) == pk:
+            serializer = IssueSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        else:
+            Response(status=status.HTTP_401_UNAUTHORIZED)
 
 
 class ProjectIssueModify(APIView):
+    """ IsIssueAuthor """
     def put(self, request, format=None):
         pass
 
@@ -157,7 +180,8 @@ class ProjectIssueModify(APIView):
         pass
 
 
-class IssueCommentsList(APIView):
+class IssueCommentsList(APIView, IsContributor):
+    permission_classes = [IsContributor]
     def get(self, request, format=None):
         pass
 
@@ -166,6 +190,7 @@ class IssueCommentsList(APIView):
 
 
 class IssueCommentDetail(APIView):
+    """ IsCommentAuthor """
     def get(self, request, format=None):
         pass
 
