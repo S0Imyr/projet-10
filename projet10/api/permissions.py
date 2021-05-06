@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission, IsAdminUser, IsAuthenticated
+from rest_framework.permissions import BasePermission, IsAdminUser
 
 
 class IsContributor(BasePermission):

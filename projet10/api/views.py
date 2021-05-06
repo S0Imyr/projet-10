@@ -10,7 +10,7 @@ from.serializers import ProjectSerializer, IssueSerializer, CommentSerializer, C
 from .models import Project, Issue, Comment, Contributor
 from authentication.models import User
 
-from .permissions import IsContributor, IsIssueAuthor, IsCommentAuthor
+from .permissions import IsContributor, IsAuthor
 
 
 @api_view(['GET'])
