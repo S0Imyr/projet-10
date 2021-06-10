@@ -1,5 +1,6 @@
 from rest_framework.permissions import BasePermission, IsAdminUser
-
+from django.shortcuts import get_object_or_404
+from .models import Project, Contributor
 
 class IsContributor(BasePermission):
     message = 'Only contributors are allowed'
