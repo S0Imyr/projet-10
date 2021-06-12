@@ -147,8 +147,11 @@ class ProjectIssueModify(APIView):
             return Response(serializer.data)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, format=None):
-        pass
+    def delete(self, request, pk1, pk2, format=None):
+        project_issues = Issue.objects.filter(project_id=pk1)
+        project_issue = project_issues.get(pk=pk2)
+        project_issue.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class IssueCommentsList(APIView, IsContributor):
