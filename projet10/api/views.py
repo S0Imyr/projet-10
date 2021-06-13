@@ -1,10 +1,11 @@
 from django.shortcuts import render, get_object_or_404
-from django.http import JsonResponse, Http404
+from django.http import Http404
 
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import serializers, status, generics
+from rest_framework.permissions import IsAuthenticated
+from rest_framework import status, generics
 
 from.serializers import ProjectSerializer, IssueSerializer, CommentSerializer, ContributorSerializer
 from .models import Project, Issue, Comment, Contributor
@@ -36,7 +37,16 @@ class ProjectsList(generics.ListCreateAPIView):
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
 
+    def get_queryset(self):
+        """Select projects where the user is involved"""
+        contributions = Contributor.objects.filter(user_id=self.request.user)
+        contributed_projects_id = []
+        for contribution in contributions:
+            contributed_projects_id.append(contribution.project_id.id)
+        return Project.objects.filter(id__in=contributed_projects_id)
+
     def perform_create(self, serializer):
+        """Create a Contributor link between the new project and the author user"""
         project = serializer.save(author_user_id=self.request.user)
         Contributor.objects.create(user_id=self.request.user, project_id=project, permission='allowed', role='author')
 
