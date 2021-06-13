@@ -4,7 +4,7 @@ from django.http import JsonResponse, Http404
 from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework import status
+from rest_framework import serializers, status, generics
 
 from.serializers import ProjectSerializer, IssueSerializer, CommentSerializer, ContributorSerializer
 from .models import Project, Issue, Comment, Contributor
@@ -29,22 +29,17 @@ def apiOverview(request):
     return Response(api_urls)
 
 
-class ProjectsList(APIView):
+class ProjectsList(generics.ListCreateAPIView):
     """
     List all projects, or create a new project
     """
-    def get(self, request, format=None):
-        projects = Project.objects.all()
-        serializer = ProjectSerializer(projects, many=True)
-        return Response(serializer.data)
+    queryset = Project.objects.all()
+    serializer_class = ProjectSerializer
 
-    def post(self, request, format=None):
-        serializer = ProjectSerializer(data=request.data)
-        if serializer.is_valid():
-            project = serializer.save()
-            Contributor.objects.create(user_id=request.user, project_id=project, permission='allowed', role='author')
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def perform_create(self, serializer):
+        project = serializer.save(author_user_id=self.request.user)
+        Contributor.objects.create(user_id=self.request.user, project_id=project, permission='allowed', role='author')
+
 
 
 class ProjectDetail(APIView, IsContributor):
