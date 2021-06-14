@@ -1,4 +1,4 @@
-from rest_framework.permissions import BasePermission, IsAdminUser
+from rest_framework.permissions import BasePermission, SAFE_METHODS
 from django.shortcuts import get_object_or_404
 from .models import Project, Contributor
 
@@ -28,10 +28,12 @@ class IsContributor(BasePermission):
             return False
 
 class IsAuthor(BasePermission):
+    """
+    Custom permission to only allow authors of an object to edit it.
+    """
     message = 'Only the author is allowed'
 
-    def has_permission(self, request, view):
-        pass
-
     def has_object_permission(self, request, view, obj):
-        return request.user == obj.author_user_id
+        if request.method in SAFE_METHODS:
+            return True
+        return obj.author_user_id == request.user
