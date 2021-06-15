@@ -29,4 +29,18 @@ class VehicleCreationTests(APITestCase):
         response = self.client.post('/api/signup', data=post_data)
         self.assertEqual(response.status_code, 301)
 
+    def test_projects_unauthorized(self):
+        response = self.client.get('/api/projects')
+        self.assertEqual(response.status_code, 301)
+
+    def test_projects_list(self):
+        self.client.force_login(user=self.user)
+        response = self.client.get('/api/projects', HTTP_AUTHORIZATION=self.token)
+        self.assertEqual(response.status_code, 301)
+
+    def test_projects_create(self):
+        self.client.force_login(user=self.user)
+        post_data = dict(title="Test title", description="Test description", type="Test type", author_user_id=1)
+        response = self.client.post('/api/projects', data=post_data)
+        self.assertEqual(response.status_code, 301)
 
