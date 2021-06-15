@@ -7,11 +7,9 @@ class IsContributor(BasePermission):
 
     def has_permission(self, request, view):
         contributors = []
-        if 'pk' in view.kwargs:
-            project = get_object_or_404(Project, pk=view.kwargs['pk'])
-        elif 'pk1' in view.kwargs:
-            project = get_object_or_404(Project, pk=view.kwargs['pk1'])
-        contributions = Contributor.objects.filter(project_id=project)
+        if 'project_pk' in view.kwargs:
+            project = get_object_or_404(Project, pk=view.kwargs['project_pk'])
+            contributions = Contributor.objects.filter(project_id=project)
         for contribution in contributions:
             contributors.append(contribution.user_id)
         return  request.user in contributors

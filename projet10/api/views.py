@@ -10,6 +10,7 @@ from rest_framework import status, generics, mixins
 from.serializers import ProjectSerializer, IssueSerializer, CommentSerializer, ContributorSerializer
 from .models import Project, Issue, Comment, Contributor
 from authentication.models import User
+from authentication.serializers import UserSerializer
 
 from .permissions import IsContributor, IsAuthor
 
@@ -57,7 +58,7 @@ class ProjectsList(generics.ListCreateAPIView):
 class ProjectDetail(mixins.RetrieveModelMixin,
                     mixins.UpdateModelMixin,
                     mixins.DestroyModelMixin,
-                    generics.GenericAPIView):
+                    generics.GenericAPIView, IsAuthor):
     """
     Retrieve, update or delete a project instance
     """
@@ -66,35 +67,45 @@ class ProjectDetail(mixins.RetrieveModelMixin,
     permission_classes = [IsAuthor]
 
     def get(self, request, *args, **kwargs):
-        return self.retrieve(request, *args, **kwargs)
+        project = get_object_or_404(Project, pk=kwargs.get("project_pk"))
+        self.check_object_permissions(request, project)
+        serializer = ProjectSerializer(project)
+        return Response(serializer.data)
 
     def put(self, request, *args, **kwargs):
-        return self.update(request, *args, **kwargs)
+        project = get_object_or_404(Project, pk=kwargs.get("project_pk"))
+        self.check_object_permissions(request, project)
+        serializer = ProjectSerializer(instance=project, data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, request, *args, **kwargs):
-        return self.destroy(request, *args, **kwargs)
+        project = get_object_or_404(Project, pk=kwargs.get("project_pk"))
+        self.check_object_permissions(request, project)
+        project.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ProjectUsersList(APIView, IsContributor):
+class ProjectUsersList(generics.ListCreateAPIView):
     """
     List all users for a given project(pk), or create a new user for a given project(pk)
     """
+    queryset = Contributor.objects.all()
+    serializer_class = ContributorSerializer
     permission_classes = [IsContributor]
 
-    def get(self, request, pk, format=None):
-        contributors = Contributor.objects.filter(project_id=pk)
-        serializer = ContributorSerializer(contributors, many=True)
-        return Response(serializer.data)
+    def get_queryset(self, *args, **kwargs):
+        project = self.kwargs.get("project_pk")
+        return Contributor.objects.filter(project_id=project)
 
-    def post(self, request, pk, format=None):
-        if int(request.data['project_id']) == pk:
-            serializer = ContributorSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            Response(status=status.HTTP_401_UNAUTHORIZED)
+    def get(self, request, *args, **kwargs):
+        return self.list(request, *args, **kwargs)
+
+    def post(self, request, *args, **kwargs):
+        return self.create(request, *args, **kwargs)
+
 
 
 class ProjectUserDelete(APIView, IsContributor):
