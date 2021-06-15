@@ -25,6 +25,8 @@ class VehicleCreationTests(APITestCase):
         self.assertEqual(response.status_code, 401)
 
     def test_register(self):
-        pass
+        post_data = dict(username="username", email="email", first_name="first_name", last_name="last_name", password="password")
+        response = self.client.post('/api/signup', data=post_data)
+        self.assertEqual(response.status_code, 301)
 
 
