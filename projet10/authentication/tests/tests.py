@@ -26,21 +26,22 @@ class VehicleCreationTests(APITestCase):
 
     def test_register(self):
         post_data = dict(username="username", email="email", first_name="first_name", last_name="last_name", password="password")
-        response = self.client.post('/api/signup', data=post_data)
-        self.assertEqual(response.status_code, 301)
+        response = self.client.post('/api/signup/', data=post_data)
+        print(len(User.objects.all()))
+        self.assertEqual(response.status_code, 201)
 
     def test_projects_unauthorized(self):
-        response = self.client.get('/api/projects')
-        self.assertEqual(response.status_code, 301)
+        response = self.client.get('/api/projects/')
+        self.assertEqual(response.status_code, 401)
 
     def test_projects_list(self):
         self.client.force_login(user=self.user)
-        response = self.client.get('/api/projects', HTTP_AUTHORIZATION=self.token)
-        self.assertEqual(response.status_code, 301)
+        response = self.client.get('/api/projects/', HTTP_AUTHORIZATION=self.token)
+        self.assertEqual(response.status_code, 200)
 
     def test_projects_create(self):
         self.client.force_login(user=self.user)
         post_data = dict(title="Test title", description="Test description", type="Test type", author_user_id=1)
-        response = self.client.post('/api/projects', data=post_data)
-        self.assertEqual(response.status_code, 301)
+        response = self.client.post('/api/projects/', data=post_data, HTTP_AUTHORIZATION=self.token)
+        self.assertEqual(response.status_code, 201)
 
