@@ -5,22 +5,28 @@ from .models import Project, Issue, Comment, Contributor
 class ProjectSerializer(serializers.ModelSerializer):
     class Meta:
         model = Project
-        fields = '__all__'
+        fields = ['title', 'description', 'type','author_user_id']
+        read_only_fields = ['author_user_id']
 
 
 class IssueSerializer(serializers.ModelSerializer):
     class Meta:
         model = Issue
-        fields = '__all__'
-
+        fields = ['title', 'desc', 'tag', 'priority', 'project_id', 'status', 'author_user_id', 'assignee_user_id', 'created_time']
+        read_only_fields = ['project_id', 'author_user_id', 'created_time']
 
 class CommentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Comment
-        fields = '__all__'
+        fields = ['description', 'author_user_id', 'issue_id', 'created_time']
+        read_only_fields = ['author_user_id', 'issue_id']
 
 
 class ContributorSerializer(serializers.ModelSerializer):
     class Meta:
         model = Contributor
-        fields = '__all__'
+        fields = ['id', 'user_id', 'project_id', 'permission', 'role']
+        read_only_fields = ['project_id']
+
+    def create(self, validated_data):
+        return Comment(**validated_data)
