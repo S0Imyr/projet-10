@@ -28,5 +28,3 @@ class ContributorSerializer(serializers.ModelSerializer):
         fields = ['id', 'user_id', 'project_id', 'permission', 'role']
         read_only_fields = ['project_id']
 
-    def create(self, validated_data):
-        return Comment(**validated_data)
