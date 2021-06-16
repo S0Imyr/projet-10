@@ -35,3 +35,14 @@ class IsAuthor(BasePermission):
         if request.method in SAFE_METHODS:
             return True
         return obj.author_user_id == request.user
+
+class IsMyContribution(BasePermission):
+    """
+    Custom permission to only allow the given contributor to delete his contribution.
+    """
+    message = "Only a contributor can withdraw himself from a project"
+
+    def has_object_permission(self, request, view, obj):
+        if request.method in SAFE_METHODS:
+            return True
+        return obj.user_id == request.user
