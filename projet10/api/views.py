@@ -5,7 +5,7 @@ from rest_framework.decorators import api_view
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
-from rest_framework import status, generics, mixins
+from rest_framework import serializers, status, generics, mixins
 
 from.serializers import ProjectSerializer, IssueSerializer, CommentSerializer, ContributorSerializer
 from .models import Project, Issue, Comment, Contributor
@@ -107,20 +107,21 @@ class ProjectUsersList(generics.ListCreateAPIView):
 
 
 class ProjectUserDelete(generics.DestroyAPIView):
+    queryset = Contributor.objects.all()
+    serializer_class = ContributorSerializer
     permission_classes = [IsAuthor]
     
-    def get_object(self, project_pk, user_pk):
-        try:
-            project = get_object_or_404(Project, pk=project_pk)
-            user = get_object_or_404(User, pk=user_pk)
-            return Contributor.objects.get(user_id=user, project_id=project)
-        except Contributor.DoesNotExist:
-            raise Http404
 
-    def delete(self, request, project_pk, user_pk):
-        contributor = self.get_object(project_pk, user_pk)
-        contributor.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def get_object(self):
+        queryset = self.get_queryset()
+        project_pk = self.kwargs["project_pk"]
+        user_pk = self.kwargs["user_pk"]
+        project = get_object_or_404(Project, pk=project_pk)
+        user = get_object_or_404(User, pk=user_pk)
+        filter = {'project_id': project, 'user_id': user}
+        contributor = get_object_or_404(queryset, **filter)
+        self.check_object_permissions(self.request, project)
+        return contributor
 
 
 class ProjectIssuesList(generics.ListCreateAPIView):
