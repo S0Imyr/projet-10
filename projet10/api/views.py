@@ -58,7 +58,7 @@ class ProjectsList(generics.ListCreateAPIView):
 class ProjectDetail(mixins.RetrieveModelMixin,
                     mixins.UpdateModelMixin,
                     mixins.DestroyModelMixin,
-                    generics.GenericAPIView, IsAuthor):
+                    generics.GenericAPIView):
     """
     Retrieve, update or delete a project instance
     """
@@ -90,7 +90,7 @@ class ProjectDetail(mixins.RetrieveModelMixin,
 
 class ProjectUsersList(generics.ListCreateAPIView):
     """
-    List all users for a given project(pk), or create a new user for a given project(pk)
+    List all users for a given project, or create a new user for a given project
     """
     queryset = Contributor.objects.all()
     serializer_class = ContributorSerializer
@@ -100,52 +100,46 @@ class ProjectUsersList(generics.ListCreateAPIView):
         project = self.kwargs.get("project_pk")
         return Contributor.objects.filter(project_id=project)
 
-    def get(self, request, *args, **kwargs):
-        return self.list(request, *args, **kwargs)
-
-    def post(self, request, *args, **kwargs):
-        return self.create(request, *args, **kwargs)
-
+    def perform_create(self, serializer, *args, **kwargs):
+        project_pk = self.kwargs['project_pk']
+        project = Project.objects.get(pk=project_pk)
+        serializer.save(project_id=project)
 
 
-class ProjectUserDelete(APIView, IsContributor):
-    permission_classes = [IsContributor]
+class ProjectUserDelete(generics.DestroyAPIView):
+    permission_classes = [IsAuthor]
     
-    def get_object(self, pk1, pk2):
+    def get_object(self, project_pk, user_pk):
         try:
-            project = get_object_or_404(Project, pk=pk1)
-            user = get_object_or_404(User, pk=pk2)
+            project = get_object_or_404(Project, pk=project_pk)
+            user = get_object_or_404(User, pk=user_pk)
             return Contributor.objects.get(user_id=user, project_id=project)
         except Contributor.DoesNotExist:
             raise Http404
 
-    def delete(self, request, pk1, pk2, format=None):
-        contributor = self.get_object(pk1, pk2)
+    def delete(self, request, project_pk, user_pk):
+        contributor = self.get_object(project_pk, user_pk)
         contributor.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class ProjectIssuesList(APIView, IsContributor):
+class ProjectIssuesList(generics.ListCreateAPIView):
+    queryset = Issue.objects.all()
+    serializer_class = IssueSerializer
     permission_classes = [IsContributor]
 
-    def get(self, request, pk, format=None):
-        issues = Issue.objects.filter(project_id=pk)
-        serializer = IssueSerializer(issues, many=True)
-        return Response(serializer.data)
+    def get_queryset(self, *args, **kwargs):
+        project = self.kwargs.get("project_pk")
+        return Issue.objects.filter(project_id=project)
 
-    def post(self, request, pk, format=None):
-        if int(request.data['project_id']) == pk:
-            serializer = IssueSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        else:
-            Response(status=status.HTTP_401_UNAUTHORIZED)
+    def perform_create(self, serializer, *args, **kwargs):
+        project_pk = self.kwargs['project_pk']
+        project = Project.objects.get(pk=project_pk)
+        serializer.save(project_id=project)
 
 
-class ProjectIssueModify(APIView):
-    """ IsIssueAuthor """
+class ProjectIssueModify(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthor]
     def put(self, request, pk1, pk2, format=None):
         project_issues = Issue.objects.filter(project_id=pk1)
         project_issue = project_issues.get(pk=pk2)
@@ -162,17 +156,23 @@ class ProjectIssueModify(APIView):
         return Response(status=status.HTTP_204_NO_CONTENT)
 
 
-class IssueCommentsList(APIView, IsContributor):
+class IssueCommentsList(generics.ListCreateAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
     permission_classes = [IsContributor]
-    def get(self, request, format=None):
-        pass
 
-    def post(self, request, format=None):
-        pass
+    def get_queryset(self, *args, **kwargs):
+        project = self.kwargs.get("project_pk")
+        return Issue.objects.filter(project_id=project)
+
+    def perform_create(self, serializer, *args, **kwargs):
+        project_pk = self.kwargs['project_pk']
+        project = Project.objects.get(pk=project_pk)
+        serializer.save(project_id=project)
 
 
-class IssueCommentDetail(APIView):
-    """ IsCommentAuthor """
+class IssueCommentDetail(generics.RetrieveUpdateDestroyAPIView):
+    permission_classes = [IsAuthor]
     def get(self, request, format=None):
         pass
 
