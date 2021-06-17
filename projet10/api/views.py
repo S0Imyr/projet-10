@@ -61,7 +61,7 @@ class ProjectDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     queryset = Project.objects.all()
     serializer_class = ProjectSerializer
-    permission_classes = [IsAuthor]
+    permission_classes = [IsContributor, IsAuthor]
 
     def get_object(self, *args, **kwargs):
         project_pk = self.kwargs["project_pk"]
