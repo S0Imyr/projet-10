@@ -128,21 +128,19 @@ class ProjectIssuesList(generics.ListCreateAPIView):
 
 
 class ProjectIssueModify(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Issue.objects.all()
+    serializer_class = IssueSerializer
     permission_classes = [IsAuthor]
-    def put(self, request, pk1, pk2, format=None):
-        project_issues = Issue.objects.filter(project_id=pk1)
-        project_issue = project_issues.get(pk=pk2)
-        serializer = IssueSerializer(instance=project_issue, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    def delete(self, request, pk1, pk2, format=None):
-        project_issues = Issue.objects.filter(project_id=pk1)
-        project_issue = project_issues.get(pk=pk2)
-        project_issue.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def get_object(self):
+        queryset = self.get_queryset()
+        project_pk = self.kwargs["project_pk"]
+        issue_pk = self.kwargs["issue_pk"]
+        project = get_object_or_404(Project, pk=project_pk)
+        filter = {'project_id': project, 'id': issue_pk}
+        issue = get_object_or_404(queryset, **filter)
+        self.check_object_permissions(self.request, issue)
+        return issue
 
 
 class IssueCommentsList(generics.ListCreateAPIView):
