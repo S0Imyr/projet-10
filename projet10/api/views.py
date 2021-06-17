@@ -160,12 +160,16 @@ class IssueCommentsList(generics.ListCreateAPIView):
 
 
 class IssueCommentDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = Comment.objects.all()
+    serializer_class = CommentSerializer
     permission_classes = [IsAuthor]
-    def get(self, request, format=None):
-        pass
 
-    def put(self, request, format=None):
-        pass
-
-    def delete(self, request, format=None):
-        pass
+    def get_object(self):
+        queryset = self.get_queryset()
+        issue_pk = self.kwargs["issue_pk"]
+        issue = get_object_or_404(Issue, pk=issue_pk)
+        comment_pk = self.kwargs["comment_pk"]
+        filter = {'issue_id': issue, 'id': comment_pk}
+        comment = get_object_or_404(queryset, **filter)
+        self.check_object_permissions(self.request, comment)
+        return comment
