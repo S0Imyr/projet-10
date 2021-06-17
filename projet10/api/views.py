@@ -55,10 +55,7 @@ class ProjectsList(generics.ListCreateAPIView):
         Contributor.objects.create(user_id=self.request.user, project_id=project, permission='allowed', role='author')
 
 
-class ProjectDetail(mixins.RetrieveModelMixin,
-                    mixins.UpdateModelMixin,
-                    mixins.DestroyModelMixin,
-                    generics.GenericAPIView):
+class ProjectDetail(generics.RetrieveUpdateDestroyAPIView):
     """
     Retrieve, update or delete a project instance
     """
@@ -66,26 +63,12 @@ class ProjectDetail(mixins.RetrieveModelMixin,
     serializer_class = ProjectSerializer
     permission_classes = [IsAuthor]
 
-    def get(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, pk=kwargs.get("project_pk"))
-        self.check_object_permissions(request, project)
-        serializer = ProjectSerializer(project)
-        return Response(serializer.data)
+    def get_object(self, *args, **kwargs):
+        project_pk = int(self.kwargs["project_pk"])
+        project = get_object_or_404(Project, pk=project_pk)
+        self.check_object_permissions(self.request, project)
+        return project
 
-    def put(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, pk=kwargs.get("project_pk"))
-        self.check_object_permissions(request, project)
-        serializer = ProjectSerializer(instance=project, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, *args, **kwargs):
-        project = get_object_or_404(Project, pk=kwargs.get("project_pk"))
-        self.check_object_permissions(request, project)
-        project.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
 
 
 class ProjectUsersList(generics.ListCreateAPIView):
@@ -97,7 +80,7 @@ class ProjectUsersList(generics.ListCreateAPIView):
     permission_classes = [IsContributor]
 
     def get_queryset(self, *args, **kwargs):
-        project = self.kwargs.get("project_pk")
+        project = kwargs.get("project_pk")
         return Contributor.objects.filter(project_id=project)
 
     def perform_create(self, serializer, *args, **kwargs):
