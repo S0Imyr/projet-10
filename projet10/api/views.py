@@ -64,7 +64,7 @@ class ProjectDetail(generics.RetrieveUpdateDestroyAPIView):
     permission_classes = [IsAuthor]
 
     def get_object(self, *args, **kwargs):
-        project_pk = int(self.kwargs["project_pk"])
+        project_pk = self.kwargs["project_pk"]
         project = get_object_or_404(Project, pk=project_pk)
         self.check_object_permissions(self.request, project)
         return project
@@ -79,8 +79,9 @@ class ProjectUsersList(generics.ListCreateAPIView):
     permission_classes = [IsContributor]
 
     def get_queryset(self, *args, **kwargs):
-        project_id = kwargs.get("project_pk")
-        return Contributor.objects.filter(project_id=project_id)
+        project_pk = self.kwargs.get("project_pk")
+        project = get_object_or_404(Project, pk=project_pk)
+        return Contributor.objects.filter(project_id=project)
 
     def perform_create(self, serializer, *args, **kwargs):
         project_pk = self.kwargs['project_pk']
@@ -118,8 +119,8 @@ class ProjectIssuesList(generics.ListCreateAPIView):
     permission_classes = [IsContributor]
 
     def get_queryset(self, *args, **kwargs):
-        project = self.kwargs.get("project_pk")
-        return Issue.objects.filter(project_id=project)
+        project_pk = self.kwargs.get("project_pk")
+        return Issue.objects.filter(project_id=project_pk)
 
     def perform_create(self, serializer, *args, **kwargs):
         project_pk = self.kwargs['project_pk']
@@ -149,13 +150,13 @@ class IssueCommentsList(generics.ListCreateAPIView):
     permission_classes = [IsContributor]
 
     def get_queryset(self, *args, **kwargs):
-        project = self.kwargs.get("project_pk")
-        return Issue.objects.filter(project_id=project)
+        issue_pk = self.kwargs.get("issue_pk")
+        return Comment.objects.filter(issue_id=issue_pk)
 
     def perform_create(self, serializer, *args, **kwargs):
-        project_pk = self.kwargs['project_pk']
-        project = Project.objects.get(pk=project_pk)
-        serializer.save(project_id=project)
+        issue_pk = self.kwargs.get("issue_pk")
+        issue = Issue.objects.get(id=issue_pk)
+        serializer.save(issue_id=issue, author_user_id=self.request.user)
 
 
 class IssueCommentDetail(generics.RetrieveUpdateDestroyAPIView):
