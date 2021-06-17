@@ -70,7 +70,6 @@ class ProjectDetail(generics.RetrieveUpdateDestroyAPIView):
         return project
 
 
-
 class ProjectUsersList(generics.ListCreateAPIView):
     """
     List all users for a given project, or create a new user for a given project
@@ -80,8 +79,8 @@ class ProjectUsersList(generics.ListCreateAPIView):
     permission_classes = [IsContributor]
 
     def get_queryset(self, *args, **kwargs):
-        project = kwargs.get("project_pk")
-        return Contributor.objects.filter(project_id=project)
+        project_id = kwargs.get("project_pk")
+        return Contributor.objects.filter(project_id=project_id)
 
     def perform_create(self, serializer, *args, **kwargs):
         project_pk = self.kwargs['project_pk']
@@ -90,6 +89,9 @@ class ProjectUsersList(generics.ListCreateAPIView):
 
 
 class ProjectUserDelete(generics.DestroyAPIView):
+    """
+    Delete a Contributor from a project
+    """
     queryset = Contributor.objects.all()
     serializer_class = ContributorSerializer
     permission_classes = [IsAuthor]
@@ -108,6 +110,9 @@ class ProjectUserDelete(generics.DestroyAPIView):
 
 
 class ProjectIssuesList(generics.ListCreateAPIView):
+    """
+    List all issues for a given project, or create a new issue for a given project
+    """
     queryset = Issue.objects.all()
     serializer_class = IssueSerializer
     permission_classes = [IsContributor]
@@ -119,7 +124,7 @@ class ProjectIssuesList(generics.ListCreateAPIView):
     def perform_create(self, serializer, *args, **kwargs):
         project_pk = self.kwargs['project_pk']
         project = Project.objects.get(pk=project_pk)
-        serializer.save(project_id=project)
+        serializer.save(project_id=project, author_user_id=self.request.user)
 
 
 class ProjectIssueModify(generics.RetrieveUpdateDestroyAPIView):
