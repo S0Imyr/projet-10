@@ -1,18 +1,13 @@
-from django.shortcuts import render, get_object_or_404
-from django.http import Http404
+from django.shortcuts import get_object_or_404
 
 from rest_framework.decorators import api_view
-from rest_framework.views import APIView
 from rest_framework.response import Response
-from rest_framework.permissions import IsAuthenticated
-from rest_framework import serializers, status, generics, mixins
+from rest_framework import generics
 
 from.serializers import ProjectSerializer, IssueSerializer, CommentSerializer, ContributorSerializer
 from .models import Project, Issue, Comment, Contributor
-from authentication.models import User
-from authentication.serializers import UserSerializer
-
 from .permissions import IsContributor, IsAuthor
+from authentication.models import User
 
 
 @api_view(['GET'])
