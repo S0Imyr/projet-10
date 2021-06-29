@@ -1,12 +1,10 @@
+from .permissions import IsContributor, IsAuthor
+from .models import Project, Issue, Comment, Contributor
+from.serializers import ProjectSerializer, IssueSerializer, CommentSerializer, ContributorSerializer
 from django.shortcuts import get_object_or_404
-
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import generics
-
-from.serializers import ProjectSerializer, IssueSerializer, CommentSerializer, ContributorSerializer
-from .models import Project, Issue, Comment, Contributor
-from .permissions import IsContributor, IsAuthor
 from authentication.models import User
 
 
@@ -91,7 +89,6 @@ class ProjectUserDelete(generics.DestroyAPIView):
     queryset = Contributor.objects.all()
     serializer_class = ContributorSerializer
     permission_classes = [IsAuthor]
-    
 
     def get_object(self):
         queryset = self.get_queryset()

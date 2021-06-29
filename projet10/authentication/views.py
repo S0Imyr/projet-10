@@ -1,4 +1,4 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import redirect
 from django.contrib.auth import authenticate, login, logout
 
 from rest_framework.views import APIView
@@ -18,6 +18,7 @@ class Register(generics.CreateAPIView):
 
 class Login(APIView):
     permission_classes = [AllowAny]
+
     def post(self, request):
         if request.user.is_authenticated:
             return redirect('api-overview')
@@ -36,6 +37,7 @@ class Login(APIView):
 
 
 class Logout(APIView):
+
     def get(self, request):
         logout(request)
         return redirect('login')
@@ -43,8 +45,8 @@ class Logout(APIView):
 
 class UsersList(APIView):
     permission_classes = [IsAdminUser]
+
     def get(self, request, format=None):
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
-

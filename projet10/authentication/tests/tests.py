@@ -1,5 +1,3 @@
-import pytest
-from django.test import TestCase
 from django.urls import reverse
 
 from rest_framework import status
@@ -8,13 +6,14 @@ from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 from authentication.models import User
 
+
 class AuthTests(APITestCase):
     client = APIClient()
 
     @classmethod
     def setUpClass(cls):
         """Log Admin"""
-        cls.user = User.objects.create_superuser('admin', 'admin@admin.com', 'admin123') 
+        cls.user = User.objects.create_superuser('admin', 'admin@admin.com', 'admin123')
         tokens = RefreshToken.for_user(cls.user)
         cls.token = str(tokens.access_token)
 
@@ -37,10 +36,8 @@ class AuthTests(APITestCase):
 
     def test_register(self):
         uri = reverse('register')
-        post_data = dict(username="username", email="email@test.com", first_name="first_name", last_name="last_name", password="password")
+        post_data = dict(
+            username="username", email="email@test.com",
+            first_name="first_name", last_name="last_name", password="password")
         response = self.client.post(uri, data=post_data)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.content)
-
-
-
-

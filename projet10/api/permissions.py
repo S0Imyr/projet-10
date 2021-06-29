@@ -2,6 +2,7 @@ from rest_framework.permissions import BasePermission, SAFE_METHODS
 from django.shortcuts import get_object_or_404
 from .models import Project, Contributor
 
+
 class IsContributor(BasePermission):
     message = 'Only contributors are allowed'
 
@@ -12,8 +13,7 @@ class IsContributor(BasePermission):
             contributions = Contributor.objects.filter(project_id=project)
         for contribution in contributions:
             contributors.append(contribution.user_id)
-        return  request.user in contributors
-        
+        return request.user in contributors
 
     def has_object_permission(self, request, view, obj):
         if isinstance(obj, Project):
@@ -21,9 +21,10 @@ class IsContributor(BasePermission):
             contributions = Contributor.objects.filter(project_id=obj)
             for contribution in contributions:
                 contributors.append(contribution.user_id)
-            return  request.user in contributors
+            return request.user in contributors
         else:
             return False
+
 
 class IsAuthor(BasePermission):
     """
@@ -36,9 +37,10 @@ class IsAuthor(BasePermission):
             return True
         return obj.author_user_id == request.user
 
+
 class IsMyContribution(BasePermission):
     """
-    Custom permission to only allow the given contributor to delete his contribution.
+    Custom permission to only allow the contributor to delete his contribution.
     """
     message = "Only a contributor can withdraw himself from a project"
 
