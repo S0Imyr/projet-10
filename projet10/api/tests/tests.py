@@ -24,10 +24,7 @@ class APITests(APITestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Log Admin"""
         cls.admin = User.objects.create_superuser('admin', 'admin@admin.com', 'admin123')
-        tokens = RefreshToken.for_user(cls.admin)
-        cls.token = str(tokens.access_token)
         cls.users = [
             User.objects.create(
                 username="Username1", email="test1@test.com",
@@ -74,8 +71,7 @@ class APITests(APITestCase):
 
     @classmethod
     def tearDownClass(cls):
-        cls.user = None
-        cls.token = None
+        cls.admin = None
         User.objects.all().delete()
 
     def login_token(self, user):

@@ -12,21 +12,24 @@ class AuthTests(APITestCase):
 
     @classmethod
     def setUpClass(cls):
-        """Log Admin"""
-        cls.user = User.objects.create_superuser('admin', 'admin@admin.com', 'admin123')
-        tokens = RefreshToken.for_user(cls.user)
-        cls.token = str(tokens.access_token)
+        """Admin"""
+        cls.admin = User.objects.create_superuser('admin', 'admin@admin.com', 'admin123')
 
     @classmethod
     def tearDownClass(cls):
-        cls.user = None
-        cls.token = None
+        cls.admin = None
         User.objects.all().delete()
 
+    def login_token(self, user):
+        self.client.force_login(user=user)
+        tokens = RefreshToken.for_user(user)
+        access_token = str(tokens.access_token)
+        return access_token
+
     def test_users_list(self):
-        self.client.force_login(user=self.user)
+        access_token = self.login_token(user=self.admin)
         uri = reverse('users-list')
-        response = self.client.get(uri, HTTP_AUTHORIZATION=self.token)
+        response = self.client.get(uri, HTTP_AUTHORIZATION=access_token)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
 
     def test_users_list_unauthorized(self):
