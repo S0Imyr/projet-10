@@ -23,14 +23,14 @@ class AuthTests(APITestCase):
         cls.token = None
         User.objects.all().delete()
 
-    def test_overview(self):
+    def test_users_list(self):
         self.client.force_login(user=self.user)
-        uri = reverse('api-overview')
+        uri = reverse('users-list')
         response = self.client.get(uri, HTTP_AUTHORIZATION=self.token)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
 
-    def test_overview_unauthorized(self):
-        uri = reverse('api-overview')
+    def test_users_list_unauthorized(self):
+        uri = reverse('users-list')
         response = self.client.get(uri)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED, response.content)
 
