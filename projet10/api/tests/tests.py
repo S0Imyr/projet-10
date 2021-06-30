@@ -84,6 +84,18 @@ class APITests(APITestCase):
         access_token = str(tokens.access_token)
         return access_token
 
+    def test_overview(self):
+        access_token = self.login_token(self.users[0])
+        uri = reverse('api-overview')
+        response = self.client.get(uri, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+
+    def test_overview_unauthorized(self):
+        uri = reverse('api-overview')
+        response = self.client.get(uri)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED, response.content)
+
+
     def test_list_projects_unauthenticated(self):
         uri = reverse('projects-list')
         response = self.client.get(uri)
