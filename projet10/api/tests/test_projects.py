@@ -11,11 +11,7 @@ from api.models import Project, Contributor, Issue, Comment,\
     ISSUE_PRIORITY_CHOICES, ISSUE_TAG_CHOICES, ISSUE_STATUS_CHOICES
 
 """
-CONTRIBUTOR_PERMISSION_CHOICES = (('not allowed','not allowed'), ('allowed','allowed'))
 PROJECT_TYPE_CHOICES = (('back-end','back-end'), ('front-end', 'front-end'), ('iOS','iOS') , ('Android','Android'))
-ISSUE_PRIORITY_CHOICES = (('low', 'low'), ('medium', 'medium'), ('high', 'high'))
-ISSUE_TAG_CHOICES = (('bug', 'bug'), ('upgrade', 'upgrade'), ('task', 'task'))
-ISSUE_STATUS_CHOICES = (('to do', 'to do'), ('in progress', 'in progress'), ('finished', 'finished'))
 """
 
 
@@ -79,18 +75,6 @@ class APITests(APITestCase):
         tokens = RefreshToken.for_user(user)
         access_token = str(tokens.access_token)
         return access_token
-
-    def test_overview(self):
-        access_token = self.login_token(self.users[0])
-        uri = reverse('api-overview')
-        response = self.client.get(uri, HTTP_AUTHORIZATION=access_token)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
-
-    def test_overview_unauthorized(self):
-        uri = reverse('api-overview')
-        response = self.client.get(uri)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED, response.content)
-
 
     def test_list_projects_unauthenticated(self):
         uri = reverse('projects-list')
@@ -187,19 +171,3 @@ class APITests(APITestCase):
         uri = reverse('project-details', args=[project.id])
         response = self.client.delete(uri, HTTP_AUTHORIZATION=access_token)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN, response.content)
-
-    def test_list_contributors_unauthenticated(self):
-        access_token = ""
-        project = Project.objects.create()
-        Contributor.objects.create(project_id=project, user_id=self.users[0])
-        uri = reverse('project-users-list', args=[project.id])
-        response = self.client.get(uri, HTTP_AUTHORIZATION=access_token)
-        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED, response.content)
-
-    def test_list_contributors(self):
-        access_token = self.login_token(user=self.users[0])
-        project = Project.objects.create()
-        Contributor.objects.create(project_id=project, user_id=self.users[0])
-        uri = reverse('project-users-list', args=[project.id])
-        response = self.client.get(uri, HTTP_AUTHORIZATION=access_token)
-        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
