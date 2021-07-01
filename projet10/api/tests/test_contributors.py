@@ -98,7 +98,7 @@ class APITests(APITestCase):
     def test_create_contributor_unauthenticated(self):
         access_token = ""
         project = self.projects[0]
-        post_data=dict(permission="allowed",role="contributor", user_id=self.notcontributor.id)
+        post_data=dict(permission="allowed", role="contributor", user_id=self.notcontributor.id)
         uri = reverse('project-users-list', args=[project.id])
         response = self.client.post(uri, data=post_data, HTTP_AUTHORIZATION=access_token)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED, response.content)
@@ -106,7 +106,7 @@ class APITests(APITestCase):
     def test_create_contributor(self):
         access_token = self.login_token(user=self.users[0])
         project = self.projects[0]
-        post_data=dict(permission="allowed",role="contributor", user_id=self.notcontributor.id)
+        post_data=dict(permission="allowed", role="contributor", user_id=self.notcontributor.id)
         uri = reverse('project-users-list', args=[project.id])
         response = self.client.post(uri, data=post_data, HTTP_AUTHORIZATION=access_token)
         self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.content)
@@ -114,34 +114,28 @@ class APITests(APITestCase):
     def test_create_contributor_not_contributor(self):
         access_token = self.login_token(user=self.notcontributor)
         project = self.projects[0]
-        post_data=dict(permission="allowed",role="contributor", user_id=self.notcontributor.id)
+        post_data=dict(permission="allowed", role="contributor", user_id=self.notcontributor.id)
         uri = reverse('project-users-list', args=[project.id])
         response = self.client.post(uri, data=post_data, HTTP_AUTHORIZATION=access_token)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN, response.content)
 
-    def test_retrieve_contributor_unauthenticated(self):
-        pass
-
-    def test_retrieve_contributor(self):
-        pass
-    
-    def test_retrieve_contributor_not_contributor(self):
-        pass
-
-    def test_update_contributor_unauthenticated(self):
-        pass
-
-    def test_update_contributor(self):
-        pass
-    
-    def test_update_contributor_not_contributor(self):
-        pass
-
     def test_delete_contributor_unauthenticated(self):
-        pass
+        access_token = ""
+        project = self.projects[0]
+        uri = reverse('delete-project-user', args=[project.id, self.users[0].id])
+        response = self.client.delete(uri, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED, response.content)
 
     def test_delete_contributor(self):
-        pass
-    
+        access_token = self.login_token(user=self.users[0])
+        project = self.projects[0]
+        uri = reverse('delete-project-user', args=[project.id, self.users[0].id])
+        response = self.client.delete(uri, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.content)
+
     def test_delete_contributor_not_contributor(self):
-        pass
+        access_token = self.login_token(user=self.notcontributor)
+        project = self.projects[0]
+        uri = reverse('delete-project-user', args=[project.id, self.users[0].id])
+        response = self.client.delete(uri, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN, response.content)
