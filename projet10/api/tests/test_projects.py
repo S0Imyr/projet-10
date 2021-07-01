@@ -6,14 +6,12 @@ from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 from authentication.models import User
 
-from api.models import Project, Contributor, Issue, Comment,\
-    CONTRIBUTOR_PERMISSION_CHOICES, PROJECT_TYPE_CHOICES, \
-    ISSUE_PRIORITY_CHOICES, ISSUE_TAG_CHOICES, ISSUE_STATUS_CHOICES
+from api.models import Project, Contributor,\
+    CONTRIBUTOR_PERMISSION_CHOICES, PROJECT_TYPE_CHOICES
 
 """
 PROJECT_TYPE_CHOICES = (('back-end','back-end'), ('front-end', 'front-end'), ('iOS','iOS') , ('Android','Android'))
 """
-
 
 class APITests(APITestCase):
     client = APIClient()

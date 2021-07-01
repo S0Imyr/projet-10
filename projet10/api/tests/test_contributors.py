@@ -6,14 +6,12 @@ from rest_framework.test import APITestCase
 from rest_framework_simplejwt.tokens import RefreshToken
 from authentication.models import User
 
-from api.models import Project, Contributor, Issue, Comment,\
-    CONTRIBUTOR_PERMISSION_CHOICES, PROJECT_TYPE_CHOICES, \
-    ISSUE_PRIORITY_CHOICES, ISSUE_TAG_CHOICES, ISSUE_STATUS_CHOICES
+from api.models import Project, Contributor,\
+    CONTRIBUTOR_PERMISSION_CHOICES, PROJECT_TYPE_CHOICES
 
 """
 CONTRIBUTOR_PERMISSION_CHOICES = (('not allowed','not allowed'), ('allowed','allowed'))
 """
-
 
 class APITests(APITestCase):
     client = APIClient()
@@ -78,35 +76,48 @@ class APITests(APITestCase):
 
     def test_list_contributors_unauthenticated(self):
         access_token = ""
-        project = Project.objects.create()
+        project = self.projects[0]
         uri = reverse('project-users-list', args=[project.id])
         response = self.client.get(uri, HTTP_AUTHORIZATION=access_token)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED, response.content)
 
-    # def test_list_contributors(self):
-    #     access_token = self.login_token(user=self.users[0])
-    #     project = Project.objects.create()
-    #     Contributor.objects.create(project_id=project, user_id=self.users[0])
-    #     uri = reverse('project-users-list', args=[project.id])
-    #     response = self.client.get(uri, HTTP_AUTHORIZATION=access_token)
-    #     self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
-
-    def test_list_contributors_not_contributor(self):
+    def test_list_contributors(self):
         access_token = self.login_token(user=self.users[0])
-        project = Project.objects.create()
-        Contributor.objects.create(project_id=project, user_id=self.users[0])
+        project = self.projects[0]
         uri = reverse('project-users-list', args=[project.id])
         response = self.client.get(uri, HTTP_AUTHORIZATION=access_token)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
 
+    def test_list_contributors_not_contributor(self):
+        access_token = self.login_token(user=self.notcontributor)
+        project = self.projects[0]
+        uri = reverse('project-users-list', args=[project.id])
+        response = self.client.get(uri, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN, response.content)
+
     def test_create_contributor_unauthenticated(self):
-        pass
+        access_token = ""
+        project = self.projects[0]
+        post_data=dict(permission="allowed",role="contributor", user_id=self.notcontributor.id)
+        uri = reverse('project-users-list', args=[project.id])
+        response = self.client.post(uri, data=post_data, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED, response.content)
 
     def test_create_contributor(self):
-        pass
-    
+        access_token = self.login_token(user=self.users[0])
+        project = self.projects[0]
+        post_data=dict(permission="allowed",role="contributor", user_id=self.notcontributor.id)
+        uri = reverse('project-users-list', args=[project.id])
+        response = self.client.post(uri, data=post_data, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.content)
+   
     def test_create_contributor_not_contributor(self):
-        pass
+        access_token = self.login_token(user=self.notcontributor)
+        project = self.projects[0]
+        post_data=dict(permission="allowed",role="contributor", user_id=self.notcontributor.id)
+        uri = reverse('project-users-list', args=[project.id])
+        response = self.client.post(uri, data=post_data, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN, response.content)
 
     def test_retrieve_contributor_unauthenticated(self):
         pass

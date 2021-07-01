@@ -16,7 +16,6 @@ ISSUE_TAG_CHOICES = (('bug', 'bug'), ('upgrade', 'upgrade'), ('task', 'task'))
 ISSUE_STATUS_CHOICES = (('to do', 'to do'), ('in progress', 'in progress'), ('finished', 'finished'))
 """
 
-
 class APITests(APITestCase):
     client = APIClient()
 
