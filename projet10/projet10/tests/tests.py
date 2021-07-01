@@ -13,27 +13,25 @@ class AuthTests(APITestCase):
     @classmethod
     def setUpClass(cls):
         cls.admin = User.objects.create_superuser('admin', 'admin@admin.com', 'admin123')
-        cls.user = User.objects.create(
+        cls.password = "username1"
+        cls.user = User.objects.create_user(
             username="Username1", email="test1@test.com",
-            password="password1", first_name="firstname1", last_name="lastname1")
-
-                
+            password=cls.password, first_name="firstname1", last_name="lastname1")
+                 
     @classmethod
     def tearDownClass(cls):
         cls.admin = None
         User.objects.all().delete()
     
     def login_token(self, user):
+        self.client.force_login(user=user)
         access_token = AccessToken.for_user(user)
         refresh_token = RefreshToken.for_user(user)
         return str(access_token), str(refresh_token)
 
     def test_login(self):
         uri = reverse('login')
-        print('Username :', self.user.username)
-        print('password :', self.user.password)
-        print('Is active :', self.user.is_active)
-        post_data = dict(username=self.user.username, password=self.user.password)
+        post_data = dict(username=self.user.username, password=self.password)
         response = self.client.post(uri, data=post_data)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
 

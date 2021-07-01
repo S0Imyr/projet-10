@@ -26,20 +26,20 @@ class APITests(APITestCase):
     def setUpClass(cls):
         cls.admin = User.objects.create_superuser('admin', 'admin@admin.com', 'admin123')
         cls.users = [
-            User.objects.create(
+            User.objects.create_user(
                 username="Username1", email="test1@test.com",
                 password="password1", first_name="firstname1", last_name="lastname1"),
-            User.objects.create(
+            User.objects.create_user(
                 username="Username2", email="test2@test.com",
                 password="password2", first_name="firstname2", last_name="lastname2"),
-            User.objects.create(
+            User.objects.create_user(
                 username="Username3", email="test3@test.com",
                 password="password3", first_name="firstname3", last_name="lastname3"),
-            User.objects.create(
+            User.objects.create_user(
                 username="Username4", email="test4@test.com",
                 password="password4", first_name="firstname4", last_name="lastname4"),
         ]
-        cls.notcontributor = User.objects.create(
+        cls.notcontributor = User.objects.create_user(
             username="Username5", email="test5@test.com",
             password="password5", first_name="firstname5", last_name="lastname5")
         cls.projects = [
