@@ -64,6 +64,8 @@ class APITests(APITestCase):
     def tearDownClass(cls):
         cls.admin = None
         User.objects.all().delete()
+        Project.objects.all().delete()
+        Contributor.objects.all().delete()
 
     def login_token(self, user):
         self.client.force_login(user=user)

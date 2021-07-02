@@ -72,7 +72,7 @@ class APITests(APITestCase):
             author_user_id=cls.users[0], assignee_user_id=cls.users[1]
             ),
             Issue.objects.create(
-            project_id=cls.projects[1], title="Project 2 - Issue 1", desc="Desc Project 1 - Issue 1",
+            project_id=cls.projects[1], title="Project 2 - Issue 1", desc="Desc Project 2 - Issue 1",
             tag=ISSUE_TAG_CHOICES[0], priority=ISSUE_PRIORITY_CHOICES[0], status=ISSUE_STATUS_CHOICES[0],
             author_user_id=cls.users[1], assignee_user_id=cls.users[2]
             ),
@@ -80,10 +80,14 @@ class APITests(APITestCase):
 
 
 
+
     @classmethod
     def tearDownClass(cls):
         cls.admin = None
         User.objects.all().delete()
+        Project.objects.all().delete()
+        Issue.objects.all().delete()
+        Contributor.objects.all().delete()
 
     def login_token(self, user):
         self.client.force_login(user=user)
@@ -148,7 +152,8 @@ class APITests(APITestCase):
     def test_update_issue_unauthenticated(self):
         access_token = ""
         project = self.projects[0]
-        uri = reverse('project-issue-modify', args=[project.id, self.issues[0].id])
+        issue = self.issues[0]
+        uri = reverse('project-issue-modify', args=[project.id, issue.id])
         put_data=dict(
             title="title", desc="Description test", tag=ISSUE_TAG_CHOICES[0],
             status=ISSUE_STATUS_CHOICES[0], priority=ISSUE_PRIORITY_CHOICES[0],
@@ -159,7 +164,8 @@ class APITests(APITestCase):
     def test_update_issue_author(self):
         access_token = self.login_token(user=self.users[0])
         project = self.projects[0]
-        uri = reverse('project-issue-modify', args=[project.id, self.issues[0].id])
+        issue = self.issues[0]
+        uri = reverse('project-issue-modify', args=[project.id, issue.id])
         put_data=dict(
             title="title", desc="Description test", tag=ISSUE_TAG_CHOICES[0],
             status=ISSUE_STATUS_CHOICES[0], priority=ISSUE_PRIORITY_CHOICES[0],
@@ -170,7 +176,8 @@ class APITests(APITestCase):
     def test_update_issue_not_author(self):
         access_token = self.login_token(user=self.users[1])
         project = self.projects[0]
-        uri = reverse('project-issue-modify', args=[project.id, self.issues[0].id])
+        issue = self.issues[0]
+        uri = reverse('project-issue-modify', args=[project.id, issue.id])
         put_data=dict(
             title="title", desc="Description test", tag=ISSUE_TAG_CHOICES[0],
             status=ISSUE_STATUS_CHOICES[0], priority=ISSUE_PRIORITY_CHOICES[0],
@@ -181,20 +188,23 @@ class APITests(APITestCase):
     def test_delete_issue_unauthenticated(self):
         access_token = ""
         project = self.projects[0]
-        uri = reverse('project-issue-modify', args=[project.id, self.issues[0].id])
+        issue = self.issues[0]
+        uri = reverse('project-issue-modify', args=[project.id, issue.id])
         response = self.client.delete(uri, HTTP_AUTHORIZATION=access_token)
         self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED, response.content)
 
     def test_delete_issue_author(self):
         access_token = self.login_token(user=self.users[0])
         project = self.projects[0]
-        uri = reverse('project-issue-modify', args=[project.id, self.issues[0].id])
+        issue = self.issues[0]
+        uri = reverse('project-issue-modify', args=[project.id, issue.id])
         response = self.client.delete(uri, HTTP_AUTHORIZATION=access_token)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.content)
 
     def test_delete_issue_not_author(self):
         access_token = self.login_token(user=self.users[1])
         project = self.projects[0]
-        uri = reverse('project-issue-modify', args=[project.id, self.issues[0].id])
+        issue = self.issues[0]
+        uri = reverse('project-issue-modify', args=[project.id, issue.id])
         response = self.client.delete(uri, HTTP_AUTHORIZATION=access_token)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN, response.content)
