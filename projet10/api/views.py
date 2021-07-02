@@ -1,11 +1,13 @@
 from .permissions import IsContributor, IsAuthor
 from .models import Project, Issue, Comment, Contributor
 from.serializers import ProjectSerializer, IssueSerializer, CommentSerializer, ContributorSerializer
+from authentication.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import generics
-from authentication.models import User
+from rest_framework import generics, status
+from django.db import IntegrityError
+from django.http import HttpResponse
 
 
 @api_view(['GET'])
@@ -65,7 +67,7 @@ class ProjectDetail(generics.RetrieveUpdateDestroyAPIView):
 
 class ProjectUsersList(generics.ListCreateAPIView):
     """
-    List all users for a given project, or create a new user for a given project
+    List all users for a given project, or create a new contributor for a given project
     """
     queryset = Contributor.objects.all()
     serializer_class = ContributorSerializer
