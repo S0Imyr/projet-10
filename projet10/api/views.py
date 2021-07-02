@@ -1,3 +1,4 @@
+from rest_framework.reverse import reverse
 from .permissions import IsContributor, IsAuthor
 from .models import Project, Issue, Comment, Contributor
 from.serializers import ProjectSerializer, IssueSerializer, CommentSerializer, ContributorSerializer
@@ -6,20 +7,20 @@ from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework import generics
+from rest_framework.views import APIView
 
 
 @api_view(['GET'])
 def apiOverview(request):
     api_urls = {
-        'Projects list (GET) and Create project (POST)': '/projects/',
-        'Get project details  (GET), Update (PUT) and Delete (DELETE) a project': '/projects/<str:pk>',
-        'Users list (GET) and Add a user to a project (POST)': '/projects/<str:pk>/users/',
-        'Delete a user from a project (DELETE)': '/projects/<str:pk>/users/<str:pk>',
-        'Issues list for a project (GET) and Create an issue for a project (POST)': '/projects/<str:pk>/issues/',
-        'Update (PUT) and Delete (DELETE) an issue for a project (PUT)': '/projects/<str:pk>/issues/<str:pk>',
-        'Comments List for an issue (GET) and Create comment about an issue (POST)': '/projects/<str:pk>/issues/<str:pk>/comments/',
-        'Update (PUT) and Delete (DELETE) a comment ': '/projects/<str:pk>/issues/<str:pk>/comments/<str:pk>',
-        'Get a comments with its id (GET)': '/projects/<str:pk>/issues/<str:pk>/comments/<str:pk>',
+        'Projects list': reverse('projects-list', request=request),
+        'Project details': '/projects/<str:pk>',
+        'Contributors list': '/projects/<str:pk>/users/',
+        'Delete a contributor': '/projects/<str:pk>/users/<str:pk>',
+        'Issues list': '/projects/<str:pk>/issues/',
+        'Modify an issue': '/projects/<str:pk>/issues/<str:pk>',
+        'Comments List': '/projects/<str:pk>/issues/<str:pk>/comments/',
+        'Comment details ': '/projects/<str:pk>/issues/<str:pk>/comments/<str:pk>',
     }
     return Response(api_urls)
 
