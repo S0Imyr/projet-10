@@ -61,14 +61,176 @@ class APITests(APITestCase):
         Contributor.objects.create(
             project_id=cls.projects[0], permission=CONTRIBUTOR_PERMISSION_CHOICES[1],
             role="contributor", user_id=cls.users[0])
+        cls.issues = [
+            Issue.objects.create(
+            project_id=cls.projects[0], title="Project 1 - Issue 1", desc="Desc Project 1 - Issue 1",
+            tag=ISSUE_TAG_CHOICES[0], priority=ISSUE_PRIORITY_CHOICES[0], status=ISSUE_STATUS_CHOICES[0],
+            author_user_id=cls.users[0], assignee_user_id=cls.users[1]
+            ),
+            Issue.objects.create(
+            project_id=cls.projects[1], title="Project 2 - Issue 1", desc="Desc Project 2 - Issue 1",
+            tag=ISSUE_TAG_CHOICES[0], priority=ISSUE_PRIORITY_CHOICES[0], status=ISSUE_STATUS_CHOICES[0],
+            author_user_id=cls.users[1], assignee_user_id=cls.users[2]
+            ),
+        ]
+        cls.comments = [
+            Comment.objects.create(
+            issue_id=cls.issues[0], author_user_id=cls.users[1],
+            description="Description Project 1 - Issue 1 Comment 1",
+            ),
+            Comment.objects.create(
+            issue_id=cls.issues[1], author_user_id=cls.users[1],
+            description="Description Project 2 - Issue 1 Comment 1",
+            ),
+        ]
+
 
     @classmethod
     def tearDownClass(cls):
         cls.admin = None
         User.objects.all().delete()
+        Project.objects.all().delete()
+        Issue.objects.all().delete()
+        Contributor.objects.all().delete()
+        Comment.objects.all().delete()
 
     def login_token(self, user):
         self.client.force_login(user=user)
         tokens = RefreshToken.for_user(user)
         access_token = str(tokens.access_token)
         return access_token
+
+    def test_list_comments_unauthenticated(self):
+        access_token = ""
+        project = self.projects[0]
+        issue = self.issues[0]
+        uri = reverse('issue-comments-list', args=[project.id, issue.id])
+        response = self.client.get(uri, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED, response.content)
+
+    def test_list_comments_contributor(self):
+        access_token = self.login_token(user=self.users[0])
+        project = self.projects[0]
+        issue = self.issues[0]
+        uri = reverse('issue-comments-list', args=[project.id, issue.id])
+        response = self.client.get(uri, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+
+    def test_list_comments_not_contributor(self):
+        access_token = self.login_token(user=self.notcontributor)
+        project = self.projects[0]
+        issue = self.issues[0]
+        uri = reverse('issue-comments-list', args=[project.id, issue.id])
+        response = self.client.get(uri, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN, response.content)
+
+    def test_create_comment_unauthenticated(self):
+        access_token = ""
+        project = self.projects[0]
+        issue = self.issues[0]
+        uri = reverse('issue-comments-list', args=[project.id, issue.id])
+        post_data=dict(description="Description test_create_comment_unauthenticated")
+        response = self.client.post(uri, data=post_data, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED, response.content)
+
+    def test_create_comment_contributor(self):
+        access_token = self.login_token(user=self.users[0])
+        project = self.projects[0]
+        issue = self.issues[0]
+        uri = reverse('issue-comments-list', args=[project.id, issue.id])
+        post_data=dict(description="Description test_create_comment_contributor")
+        response = self.client.post(uri, data=post_data, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_201_CREATED, response.content)
+
+    def test_create_comment_not_contributor(self):
+        access_token = self.login_token(user=self.notcontributor)
+        project = self.projects[0]
+        issue = self.issues[0]
+        uri = reverse('issue-comments-list', args=[project.id, issue.id])
+        post_data=dict(description="Description test_create_comment_not_contributor")
+        response = self.client.post(uri, data=post_data, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN, response.content)
+
+    def test_retrieve_comment_unauthenticated(self):
+        access_token = ""
+        project = self.projects[0]
+        issue = self.issues[0]
+        comment = self.comments[0]
+        uri = reverse('issue-comment-detail', args=[project.id, issue.id, comment.id])
+        response = self.client.get(uri, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED, response.content)
+
+    def test_retrieve_comment_contributor(self):
+        access_token = self.login_token(user=self.users[1])
+        project = self.projects[0]
+        issue = self.issues[0]
+        comment = self.comments[0]
+        uri = reverse('issue-comment-detail', args=[project.id, issue.id, comment.id])
+        response = self.client.get(uri, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+
+    def test_retrieve_comment_not_contributor(self):
+        access_token = self.login_token(user=self.notcontributor)
+        project = self.projects[0]
+        issue = self.issues[0]
+        comment = self.comments[0]
+        uri = reverse('issue-comment-detail', args=[project.id, issue.id, comment.id])
+        response = self.client.get(uri, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN, response.content)
+
+    def test_update_comment_unauthenticated(self):
+        access_token = ""
+        project = self.projects[0]
+        issue = self.issues[0]
+        comment = self.comments[0]
+        uri = reverse('issue-comment-detail', args=[project.id, issue.id, comment.id])
+        put_data=dict(description="Description test_update_comment_not_author")
+        response = self.client.put(uri, data=put_data, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED, response.content)
+
+    def test_update_comment_author(self):
+        access_token = self.login_token(user=self.users[1])
+        project = self.projects[0]
+        issue = self.issues[0]
+        comment = self.comments[0]
+        uri = reverse('issue-comment-detail', args=[project.id, issue.id, comment.id])
+        put_data=dict(description="Description test_update_comment_author")
+        response = self.client.put(uri, data=put_data, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
+
+    def test_update_comment_not_author(self):
+        access_token = self.login_token(user=self.users[0])
+        project = self.projects[0]
+        issue = self.issues[0]
+        comment = self.comments[0]
+        uri = reverse('issue-comment-detail', args=[project.id, issue.id, comment.id])
+        put_data=dict(description="Description test_comment_issue_not_author")
+        response = self.client.put(uri, data=put_data, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN, response.content)
+
+    def test_delete_comment_unauthenticated(self):
+        access_token = ""
+        project = self.projects[0]
+        issue = self.issues[0]
+        comment = self.comments[0]
+        uri = reverse('issue-comment-detail', args=[project.id, issue.id, comment.id])
+        response = self.client.delete(uri, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_401_UNAUTHORIZED, response.content)
+
+    def test_delete_comment_author(self):
+        access_token = self.login_token(user=self.users[1])
+        project = self.projects[0]
+        issue = self.issues[0]
+        comment = self.comments[0]
+        uri = reverse('issue-comment-detail', args=[project.id, issue.id, comment.id])
+        response = self.client.delete(uri, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.content)
+
+    def test_delete_comment_not_author(self):
+        access_token = self.login_token(user=self.users[0])
+        project = self.projects[0]
+        issue = self.issues[0]
+        comment = self.comments[0]
+        uri = reverse('issue-comment-detail', args=[project.id, issue.id, comment.id])
+        response = self.client.delete(uri, HTTP_AUTHORIZATION=access_token)
+        self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN, response.content)
