@@ -5,9 +5,7 @@ from authentication.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from rest_framework import generics, status
-from django.db import IntegrityError
-from django.http import HttpResponse
+from rest_framework import generics
 
 
 @api_view(['GET'])
