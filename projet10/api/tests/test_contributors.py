@@ -9,9 +9,6 @@ from authentication.models import User
 from api.models import Project, Contributor,\
     CONTRIBUTOR_PERMISSION_CHOICES, PROJECT_TYPE_CHOICES
 
-"""
-CONTRIBUTOR_PERMISSION_CHOICES = (('not allowed','not allowed'), ('allowed','allowed'))
-"""
 
 class APITests(APITestCase):
     client = APIClient()
@@ -118,6 +115,14 @@ class APITests(APITestCase):
         uri = reverse('project-users-list', args=[project.id])
         response = self.client.post(uri, data=post_data, HTTP_AUTHORIZATION=access_token)
         self.assertEqual(response.status_code, status.HTTP_403_FORBIDDEN, response.content)
+
+    # def test_create_contributor_already_contributor(self):
+    #     access_token = self.login_token(user=self.users[0])
+    #     project = self.projects[0]
+    #     post_data=dict(permission="allowed", role="contributor", user_id=self.users[0].id)
+    #     uri = reverse('project-users-list', args=[project.id])
+    #     response = self.client.post(uri, data=post_data, HTTP_AUTHORIZATION=access_token)
+    #     self.assertEqual(response.status_code, status.HTTP_409_CONFLICT, response.content)
 
     def test_delete_contributor_unauthenticated(self):
         access_token = ""
