@@ -140,8 +140,8 @@ class APITests(APITestCase):
         response = self.client.delete(uri, HTTP_AUTHORIZATION=access_token)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.content)
 
-    def test_delete_contributor_not_contributor(self):
-        access_token = self.login_token(user=self.notcontributor)
+    def test_delete_contributor_not_author(self):
+        access_token = self.login_token(user=self.users[1])
         project = self.projects[0]
         uri = reverse('delete-project-user', args=[project.id, self.users[0].id])
         response = self.client.delete(uri, HTTP_AUTHORIZATION=access_token)
