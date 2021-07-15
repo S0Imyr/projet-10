@@ -60,7 +60,7 @@ Voici quelques comptes pour explorer :
   - Utilisateur : takeshi, 
   Mot de passe : Kitano
 
-Une fois installé, toutes les étapes ne sont pas nécessaires. Pour les lancements ultérieurs du serveur de l'API, il suffit d'exécuter les étapes 4 et 6 à partir du répertoire racine du projet.
+Une fois installé, toutes les étapes ne sont pas nécessaires. Pour les lancements ultérieurs du serveur de l'API, il suffit d'exécuter les étapes 4 et 12 à partir du répertoire racine du projet.
 
 ## Arrêter le serveur
 
