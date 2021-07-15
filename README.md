@@ -24,8 +24,8 @@ Puis suivre les étapes suivantes :
 
 ### Creation de la base de données
 
-6. Créer la base de données avec votre nom d'utilisateur sous PostgreSQL : `$ createdb -O UserName projet9`
-7. Renseigner votre nom d'utilisateur dans Projet9/Projet9/settings.py :
+6. Créer la base de données avec votre nom d'utilisateur sous PostgreSQL : `$ createdb -O UserName projet10`
+7. Renseigner votre nom d'utilisateur dans Projet10/Projet10/settings.py :
 `DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
