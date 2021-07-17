@@ -143,8 +143,8 @@ class APITests(APITestCase):
         response = self.client.put(uri, data=post_data, HTTP_AUTHORIZATION=access_token)
         self.assertEqual(response.status_code, status.HTTP_200_OK, response.content)
 
-    def test_update_project_not_contributor(self):
-        access_token = self.login_token(user=self.notcontributor)
+    def test_update_project_not_author(self):
+        access_token = self.login_token(user=self.users[2])
         project = self.projects[0]
         uri = reverse('project-details', args=[project.id])
         post_data = dict(title="Update title", description="Update description", type="back-end")
@@ -166,7 +166,7 @@ class APITests(APITestCase):
         response = self.client.delete(uri, HTTP_AUTHORIZATION=access_token)
         self.assertEqual(response.status_code, status.HTTP_204_NO_CONTENT, response.content)
 
-    def test_delete_project_not_contributor(self):
+    def test_delete_project_not_author(self):
         access_token = self.login_token(user=self.users[2])
         project = self.projects[0]
         uri = reverse('project-details', args=[project.id])
