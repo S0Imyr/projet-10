@@ -15,7 +15,7 @@ Puis suivre les étapes suivantes :
 2. Accéder au dossier ainsi créé avec la commande : `$ cd Projet-10`
 3. Créer un environnement virtuel pour le projet avec 
     - `$ python -m venv env` sous windows 
-    - ou `$ python3 -m venv env` sous macos ou linux.
+    - ou `$ python3 -m venv env` sous MacOS ou Linux.
 4. Activez l'environnement virtuel avec 
     - `$ source env/Scripts/activate` sous windows 
     - ou `$ source env/bin/activate` sous MacOS ou Linux.
@@ -41,8 +41,12 @@ Puis suivre les étapes suivantes :
 10. Alimenter la base de données des utilisateurs `$ python manage.py loaddata authentication/fixtures/authentication.json`
 11. Alimenter la base de données des projets `$ python manage.py loaddata api/fixtures/api.json`
 
+En cas de problème d'encodage, ne pas hésiter à utiliser un éditeur pour ouvrir et sauvegarder les fichiers JSON avec l'encodage utf-8. Puis réalimenter (étape 10 et 11).
+
 ### Lancement du serveur
 Revenir dans le terminal et tapper :
+
+12. Démarrer le serveur avec `$ python manage.py runserver`
 
 Lorsque le serveur fonctionne, après l'étape 12 de la procédure, on peut :
  - Se créer un compte avec l'url : [http://127.0.0.1:8000/api/signup/](http://127.0.0.1:8000/api/signup/).
