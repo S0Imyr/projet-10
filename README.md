@@ -70,5 +70,11 @@ Pour arrêter le serveur aller dans le terminal où il a été lancé, puis appu
 
 ## Tests
 
-Pour lancer les test, se placer dans le terminal dans le dossier : projet-10/projet10
-Puis tapper : `$ python manage.py test`
+Pour lancer les test, se placer dans le terminal dans le dossier : projet-10/projet10.
+
+Puis tapper : `$ python manage.py test`.
+
+## Documentation
+
+La documentation Postman est disponible à l'adresse :
+[https://documenter.getpostman.com/view/14358423/TzeTKpkF#79cc4aa4-6f4a-4751-8d7d-9881a3c49ee4](https://documenter.getpostman.com/view/14358423/TzeTKpkF#79cc4aa4-6f4a-4751-8d7d-9881a3c49ee4).
