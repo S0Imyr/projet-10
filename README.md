@@ -55,8 +55,6 @@ Lorsque le serveur fonctionne, après l'étape 12 de la procédure, on peut :
 Pour les autres endpoints, il faudra fournir le token.
 
 Voici quelques comptes pour explorer :
-  - Utilisateur : raphael, 
-  Mot de passe : losseclossec
 
   - Utilisateur : Franklin, 
   Mot de passe : Roosevelt
@@ -69,3 +67,8 @@ Une fois installé, toutes les étapes ne sont pas nécessaires. Pour les lancem
 ## Arrêter le serveur
 
 Pour arrêter le serveur aller dans le terminal où il a été lancé, puis appuyer sur les touches Ctrl+C.
+
+## Tests
+
+Pour lancer les test, se placer dans le terminal dans le dossier : projet-10/projet10
+Puis tapper : `$ python manage.py test`
