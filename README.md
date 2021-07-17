@@ -77,4 +77,4 @@ Puis tapper : `$ python manage.py test`.
 ## Documentation
 
 La documentation Postman est disponible à l'adresse :
-[https://documenter.getpostman.com/view/14358423/TzeTKpkF#79cc4aa4-6f4a-4751-8d7d-9881a3c49ee4](https://documenter.getpostman.com/view/14358423/TzeTKpkF#79cc4aa4-6f4a-4751-8d7d-9881a3c49ee4).
+[https://documenter.getpostman.com/view/14358423/TzeTKpkF](https://documenter.getpostman.com/view/14358423/TzeTKpkF).
