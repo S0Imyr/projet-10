@@ -32,8 +32,8 @@ POSTGRES_PASSWORD*******
 
 ### Creation de la base de données
 
-6. Créer la base de données avec votre nom d'utilisateur sous PostgreSQL : `createdb -U UserName issuesdb`
-7. Renseigner votre nom d'utilisateur dans src/config/settings.py :
+7. Créer la base de données avec votre nom d'utilisateur sous PostgreSQL : `createdb -U UserName issuesdb`
+8. Renseigner votre nom d'utilisateur dans src/config/settings.py :
 ```
 DATABASES = {
     'default': {
@@ -46,19 +46,19 @@ DATABASES = {
     }
 }
 ```
-8. Une nouvelle fois : `cd src`
-9. Appliquer les migrations `python manage.py migrate`
-10. Alimenter la base de données des utilisateurs `python manage.py loaddata authentication/fixtures/authentication.json`
-11. Alimenter la base de données des projets `python manage.py loaddata api/fixtures/api.json`
+9. Une nouvelle fois : `cd src`
+10. Appliquer les migrations `python manage.py migrate`
+11. Alimenter la base de données des utilisateurs `python manage.py loaddata accounts/fixtures/authentication.json`
+12. Alimenter la base de données des projets `python manage.py loaddata api/fixtures/api.json`
 
-En cas de problème d'encodage, ne pas hésiter à utiliser un éditeur pour ouvrir et sauvegarder les fichiers JSON avec l'encodage utf-8. Puis réalimenter (étape 10 et 11).
+En cas de problème d'encodage, ne pas hésiter à utiliser un éditeur pour ouvrir et sauvegarder les fichiers JSON avec l'encodage utf-8. Puis réalimenter (étape 11 et 12).
 
 ### Lancement du serveur
 Revenir dans le terminal et tapper :
 
-12. Démarrer le serveur avec `python manage.py runserver`
+13. Démarrer le serveur avec `python manage.py runserver`
 
-Lorsque le serveur fonctionne, après l'étape 12 de la procédure, on peut :
+Lorsque le serveur fonctionne, après l'étape 13 de la procédure, on peut :
  - Se créer un compte avec l'url : [http://127.0.0.1:8000/api/signup/](http://127.0.0.1:8000/api/signup/).
  - Obtenir un token avec : [http://127.0.0.1:8000/api/login/](http://127.0.0.1:8000/api/login/).
 
@@ -73,10 +73,6 @@ Voici quelques comptes pour explorer :
   Mot de passe : Kitano
 
 Une fois installé, toutes les étapes ne sont pas nécessaires. Pour les lancements ultérieurs du serveur de l'API, il suffit d'exécuter les étapes 4 et 12 à partir du répertoire racine du projet.
-
-## Arrêter le serveur
-
-Pour arrêter le serveur aller dans le terminal où il a été lancé, puis appuyer sur les touches Ctrl+C.
 
 ## Tests
 
