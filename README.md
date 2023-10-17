@@ -24,19 +24,19 @@ Puis suivre les étapes suivantes :
 
 ### Creation de la base de données
 
-6. Créer la base de données avec votre nom d'utilisateur sous PostgreSQL : `$ createdb -O UserName projet10`
-7. Renseigner votre nom d'utilisateur dans Projet10/Projet10/settings.py :
+6. Créer la base de données avec votre nom d'utilisateur sous PostgreSQL : `$ createdb -U UserName issuesdb`
+7. Renseigner votre nom d'utilisateur dans src/config/settings.py :
 `DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'projet10',
+        'NAME': 'issuesdb',
         'USER': 'UserName',
         'PASSWORD': '',
         'HOST': '',
         'PORT': '5432',
     }
 }`
-8. Une nouvelle fois : `$ cd Projet10`
+8. Une nouvelle fois : `$ cd src`
 9. Appliquer les migrations `$ python manage.py migrate`
 10. Alimenter la base de données des utilisateurs `$ python manage.py loaddata authentication/fixtures/authentication.json`
 11. Alimenter la base de données des projets `$ python manage.py loaddata api/fixtures/api.json`
@@ -70,7 +70,7 @@ Pour arrêter le serveur aller dans le terminal où il a été lancé, puis appu
 
 ## Tests
 
-Pour lancer les test, se placer dans le terminal dans le dossier : projet-10/projet10.
+Pour lancer les test, se placer dans le terminal dans le dossier : src/config.
 
 Puis tapper : `$ python manage.py test`.
 

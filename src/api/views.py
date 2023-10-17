@@ -2,7 +2,7 @@ from rest_framework.reverse import reverse
 from .permissions import IsContributor, IsAuthor
 from .models import Project, Issue, Comment, Contributor
 from.serializers import ProjectSerializer, IssueSerializer, CommentSerializer, ContributorSerializer
-from authentication.models import User
+from accounts.models import User
 from django.shortcuts import get_object_or_404
 from rest_framework.decorators import api_view
 from rest_framework.response import Response

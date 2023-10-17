@@ -4,7 +4,7 @@ __pycache__/
 *.py[cod]
 *$py.class
 
-
+.idea
 
 # Installer logs
 pip-log.txt
@@ -36,4 +36,5 @@ db.sqlite3-journal
 
 
 env/
-
+/.venv/
+/.env
